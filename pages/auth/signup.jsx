@@ -1,14 +1,25 @@
 import { useState } from 'react';
+import axios from 'axios';
 
 export default () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState([]);
 
-  const onSubmit = event => {
+  const onSubmit = async event => {
     event.preventDefault();
 
-    console.log('email: ', email);
-    console.log('password: ', password);
+    try {
+      const response = await axios.post('/api/users/signup', {
+        email,
+        password,
+      });
+
+      console.log('resposne: ', response.data);
+    } catch (error) {
+      console.error('Error signing up: ', error.response.data);
+      setErrors(error.response.data.errors);
+    }
   };
 
   return (
@@ -32,6 +43,18 @@ export default () => {
           onChange={e => setPassword(e.target.value)}
         />
       </div>
+
+      {errors.length > 0 && (
+        <div className='alert alert-danger'>
+          <h5>Ooops..</h5>
+          <ul className='my-0'>
+            {errors.map(error => (
+              <li key={error.message}>{error.message}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <button className='btn btn-primary'>Sign up</button>
     </form>
   );
