@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { buildClient } from '../api/build-client';
 
 const Home = ({ currentUser }) => {
   console.log('CURRENT USER: ', currentUser);
@@ -9,13 +9,8 @@ const Home = ({ currentUser }) => {
   );
 };
 
-export const getServerSideProps = async ({ req }) => {
-  const { data } = await axios.get(
-    'http://ingress-nginx-controller.ingress-nginx.svc.cluster.local/api/users/currentuser',
-    {
-      headers: req.headers,
-    }
-  );
+export const getServerSideProps = async context => {
+  const { data } = await buildClient(context).get('/api/users/currentuser');
 
   return {
     props: {
